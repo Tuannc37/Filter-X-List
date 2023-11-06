@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <title>Liên kết Twitter theo thứ tự ngẫu nhiên</title>
     <style>
-        /* CSS để trang trí giao diện */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -36,12 +35,12 @@
     <textarea id="linksTextarea" rows="10" style="width: 100%;" placeholder="Dán liên kết ở đây..."></textarea>
     <input id="usernameInput" type="text" placeholder="Tên của bạn">
     <button id="processButton">Xử lý</button>
-    <h2>Kết quả:</h2>
+
+    <h2>Kết quả:</h2><button id="copyButton">Sao chép kết quả</button>
     <ul class="links-column" id="result"></ul>
 </div>
 
 <script>
-
     document.getElementById("processButton").addEventListener("click", function() {
         var linksTextarea = document.getElementById("linksTextarea");
         var usernameInput = document.getElementById("usernameInput");
@@ -66,6 +65,27 @@
             listItem.textContent = link;
             result.appendChild(listItem);
         });
+    });
+
+    document.getElementById("copyButton").addEventListener("click", function() {
+        var result = document.getElementById("result");
+
+        var textToCopy = Array.from(result.getElementsByTagName("li")).map(li => li.textContent).join('\n');
+
+        // Tạo một thẻ textarea ẩn để sao chép dữ liệu vào
+        var textArea = document.createElement("textarea");
+        textArea.value = textToCopy;
+        document.body.appendChild(textArea);
+
+        // Chọn và sao chép dữ liệu vào clipboard
+        textArea.select();
+        document.execCommand("copy");
+
+        // Xóa thẻ textarea ẩn
+        document.body.removeChild(textArea);
+
+        // Thông báo cho người dùng rằng dữ liệu đã được sao chép
+        alert("Kết quả đã được sao chép vào clipboard!");
     });
 </script>
 </body>
