@@ -1,92 +1,151 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Liên kết Twitter theo thứ tự ngẫu nhiên</title>
+    <title>Check số lượng link đã chạy</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- JS Bootstrap -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f2f2f2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
         }
         .container {
-            max-width: 600px;
-            margin: 0 auto;
+            text-align: center;
+            background-color: #8BC34A;
             padding: 20px;
-            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 50%;
+            max-width: 600px;
+        }
+        input[type="number"],
+        textarea {
+            padding: 8px;
+            margin: 5px;
+            width: calc(100% - 20px);
             border: 1px solid #ccc;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 4px;
         }
-        .links-column {
-            column-count: 1;
+        button {
+            padding: 10px 20px;
+            margin: 10px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
         }
-        .links-list {
-            list-style-type: none;
-            padding: 0;
+        button:hover {
+            background-color: #45a049;
+        }
+        label {
+            display: block;
+            text-align: left;
+            margin-bottom: 5px;
+        }
+        .result {
+            border-radius: 4px;
+        }
+        .modal-content {
+            background-color: #f9f9f9;
+        }
+        .modal-header {
+            background-color: #4CAF50;
+            color: white;
+            border-bottom: none;
+        }
+        .modal-body, .modal-footer {
+            text-align: center;
+        }
+        .awesome, .run-more {
+            font-size: 18px;
+            margin-top: 10px;
+        }
+        .awesome {
+            color: #4CAF50;
+        }
+        .run-more {
+            color: #f44336;
         }
     </style>
 </head>
 <body>
 <div class="container">
-    <h1>Liên kết Twitter theo thứ tự ngẫu nhiên</h1>
-    <p>Nhập danh sách các liên kết Twitter cần xử lý:</p>
-    <textarea id="linksTextarea" rows="10" style="width: 100%;" placeholder="Dán liên kết ở đây..."></textarea>
-    <input id="usernameInput" type="text" placeholder="Tên của bạn">
-    <button id="processButton">Xử lý</button>
-
-    <h2>Kết quả:</h2><button id="copyButton">Sao chép kết quả</button>
-    <ul class="links-column" id="result"></ul>
+    <h2>KIỂM TRA SỐ LINK ĐÃ CHẠY ADS</h2>
+    <label for="tongSoLinkHomNay">Tổng số link hôm nay:</label>
+    <input type="number" id="tongSoLinkHomNay" placeholder="Nhập tổng số link hôm nay"><br>
+    <label for="dataInput">Nhập dữ liệu đã chạy:</label>
+    <textarea rows="9" cols="70"  type="text" id="dataInput" placeholder="Nhập dữ liệu các link"></textarea><br>
+    <button onclick="tinhSoLuongLinkChay()">Kiểm tra</button>
+    <!-- Modal -->
+    <div class="modal fade" id="myModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">Thông báo</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <!-- Modal body -->
+                <div class="modal-body">
+                    <div id="result"></div>
+                </div>
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
-    document.getElementById("processButton").addEventListener("click", function() {
-        var linksTextarea = document.getElementById("linksTextarea");
-        var usernameInput = document.getElementById("usernameInput");
-        var result = document.getElementById("result");
+    function tinhSoLuongLinkChay() {
+        let tongSoLinkHomNay = parseInt(document.getElementById('tongSoLinkHomNay').value);
+        let data = document.getElementById('dataInput').value;
+        let links = data.split('|');
+        let soLuongLinkDaChay = links.length;
 
-        var links = linksTextarea.value.split('\n').filter(link => link.trim() !== '');
-        var username = usernameInput.value;
-
-        links = links.filter(link => !link.includes(username));
-
-        for (var i = links.length - 1; i > 0; i--) {
-            var j = Math.floor(Math.random() * (i + 1));
-            var temp = links[i];
-            links[i] = links[j];
-            links[j] = temp;
+        if (soLuongLinkDaChay == tongSoLinkHomNay) {
+            showResult('Bạn đã chạy hết', soLuongLinkDaChay);
+            showAwesome();
+        } else {
+            let soLuongLinkConThieu = tongSoLinkHomNay - soLuongLinkDaChay;
+            showResult('Số lượng link còn thiếu: ' + soLuongLinkConThieu, soLuongLinkDaChay);
+            showRunMore();
         }
+    }
 
-        result.innerHTML = '';
+    function showResult(message, soLuongLinkDaChay) {
+        let resultDiv = document.getElementById('result');
+        resultDiv.innerHTML = `
+            <div class="result">
+                <p>${message}</p>
+                <p>Bạn đã chạy được ${soLuongLinkDaChay} link.</p>
+            </div>
+        `;
+        $('#myModal').modal('show'); // Hiển thị modal
+    }
 
-        links.forEach(function(link) {
-            var listItem = document.createElement("li");
-            listItem.textContent = link;
-            result.appendChild(listItem);
-        });
-    });
+    function showAwesome() {
+        let resultDiv = document.getElementById('result');
+        resultDiv.innerHTML += `<div class="awesome">Tuyệt vời! Bạn làm tốt lắm!</div>`;
+    }
 
-    document.getElementById("copyButton").addEventListener("click", function() {
-        var result = document.getElementById("result");
-
-        var textToCopy = Array.from(result.getElementsByTagName("li")).map(li => li.textContent).join('\n');
-
-        // Tạo một thẻ textarea ẩn để sao chép dữ liệu vào
-        var textArea = document.createElement("textarea");
-        textArea.value = textToCopy;
-        document.body.appendChild(textArea);
-
-        // Chọn và sao chép dữ liệu vào clipboard
-        textArea.select();
-        document.execCommand("copy");
-
-        // Xóa thẻ textarea ẩn
-        document.body.removeChild(textArea);
-
-        // Thông báo cho người dùng rằng dữ liệu đã được sao chép
-        alert("Kết quả đã được sao chép vào clipboard!");
-    });
+    function showRunMore() {
+        let resultDiv = document.getElementById('result');
+        resultDiv.innerHTML += `<div class="awesome">Chạy tiếp đi bạn ơi :))</div>`;
+    }
 </script>
 </body>
 </html>
